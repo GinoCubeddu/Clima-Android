@@ -35,7 +35,6 @@ public class WeatherDataModel {
         return weatherData;
     }
 
-
     // TODO: Uncomment to this to get the weather image name from the condition:
     private static String updateWeatherIcon(int condition) {
 
