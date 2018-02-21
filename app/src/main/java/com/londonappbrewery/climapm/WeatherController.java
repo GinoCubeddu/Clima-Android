@@ -74,7 +74,10 @@ public class WeatherController extends AppCompatActivity {
 
     // TODO: Add getWeatherForCurrentLocation() here:
     private void getWeatherForCurrentLocation() {
+        // Grab the location manager from the system
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        // Create a new listener to attempt to get the location
         mLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -101,15 +104,24 @@ public class WeatherController extends AppCompatActivity {
             }
         };
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        // Check to see if we have permission to access location
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            // If we don't have permission then request it
             ActivityCompat.requestPermissions(
                     this,
                     new String[] {Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_CODE
             );
+            // ONCE REQUESTED AND USER RESPONDS ON RESUME WILL GET CALLED AGAIN
+            // THIS MEANS WE CAN RETURN AND THIS METHOD WILL GET CALLED AGAIN THROUGH
+            // ON RESUME
             return;
         }
 
+        // If we reach here then we have permision so we can request the location
+        // from the manager.
         mLocationManager.requestLocationUpdates(
                 LOCATION_PROVIDER,
                 MIN_TIME,
@@ -122,7 +134,10 @@ public class WeatherController extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
+        // Check if the request belongs to our request code
         if (requestCode == REQUEST_CODE) {
+            // If the length of the array is greater than one and if the first result is "PERMISSION_GRANTED"
+            // then we are ok to use the service otherwise we are not.
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d("Clima", "onRequestPermissionsResult(): Permision Granted");
                 getWeatherForCurrentLocation();
