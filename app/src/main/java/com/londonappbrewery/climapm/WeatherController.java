@@ -15,6 +15,15 @@ import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 
 public class WeatherController extends AppCompatActivity {
@@ -86,6 +95,17 @@ public class WeatherController extends AppCompatActivity {
                 String latitude = String.valueOf(location.getLatitude());
                 Log.d("Clima", "Current long is " + longitude);
                 Log.d("Clima", "Current lat is " + latitude);
+
+                // Create a new Param holder for our request containing the gathered lat/lon
+                RequestParams params = new RequestParams();
+
+                // insert the lat lon and app id into the new object
+                params.put("lat", latitude);
+                params.put("lon", longitude);
+                params.put("appid", APP_ID);
+
+                // call the method which will send the request with the new params
+                letsDoSomeNetworking(params);
             }
 
             @Override
@@ -147,7 +167,26 @@ public class WeatherController extends AppCompatActivity {
         }
     }
 // TODO: Add letsDoSomeNetworking(RequestParams params) here:
+    private void letsDoSomeNetworking(RequestParams params) {
+        // Create a new http client to send our request
+        AsyncHttpClient client = new AsyncHttpClient();
 
+        // Attempt to get the data by sending a GET request to which we expect a
+        // JSON response
+        client.get(WEATHER_URL, params, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.d("Clima", "Success! JSON: " + response.toString());
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                Log.e("Clima", "Failure! " + e.toString());
+                Log.e("Clima", "Status code " + statusCode);
+                Toast.makeText(WeatherController.this, "Request Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
 
     // TODO: Add updateUI() here:
